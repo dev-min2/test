@@ -14,10 +14,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class WebSecurityConfig {
 	private List<String> permitAllUrl = null;
+	private List<String> permitUserUrl = null;
+	private List<String> permitAdminUrl = null;
 	
 	public WebSecurityConfig() {
 		// 로그인하지않아도 허용되는 경로들 삽입.
 		permitAllUrl = new ArrayList<String>();
+		permitUserUrl = new ArrayList<String>();
+		permitAdminUrl = new ArrayList<String>();
 		
 		// 각 이름별 함수에다 Url넣어주세요.
 		this.insertPermitAllUrlByMin(); //민교
@@ -37,7 +41,8 @@ public class WebSecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests((requests) -> requests
 				.antMatchers(permitAllUrl.toArray(new String[permitAllUrl.size()])).permitAll() // 해당 경로의 페이지는 모두 접속허용
-				.antMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER")
+				.antMatchers(permitUserUrl.toArray(new String[permitUserUrl.size()])).hasAnyRole("USER","ADMIN")
+				.antMatchers(permitAdminUrl.toArray(new String[permitAdminUrl.size()])).hasAnyRole("ADMIN", "SUPER") // "/admin/**등
 				.anyRequest().authenticated() // 그 외는 모두 로그인해야만 접근이 가능
 			)
 			.formLogin((form) -> form
